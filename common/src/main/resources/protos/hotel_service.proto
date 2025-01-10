@@ -5,7 +5,7 @@ import "basics.proto";
 service HotelService {
   rpc getAllHotels(EmptyMessage) returns (ManyHotel);
   rpc getHotelById(IntegerId) returns (Hotel);
-  rpc searchRoom(SearchRoomMessage) returns (ManyRoom);
+  rpc searchRoom(SearchRoomMessage) returns (Hotel);
 }
 
 message SearchRoomMessage {
