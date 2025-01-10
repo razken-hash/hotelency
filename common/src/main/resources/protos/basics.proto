@@ -1,0 +1,30 @@
+syntax = "proto3";
+option java_package = "com.example.grpc";
+
+message EmptyMessage {
+}
+
+message IntegerId {
+  int32 id = 1;
+}
+
+message Date {
+  int32 year = 1;
+  int32 month = 2;
+  int32 day = 3;
+}
+
+message Time {
+  int32 hour = 1;
+  int32 minute = 2;
+  optional int32 second = 3;
+}
+
+message DateTime {
+  int32 year = 1;
+  int32 month = 2;
+  int32 day = 3;
+  optional int32 hour = 4;
+  optional int32 minute = 5;
+  optional int32 second = 6;
+}
