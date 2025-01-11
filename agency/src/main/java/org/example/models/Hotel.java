@@ -1,8 +1,10 @@
 package org.example.models;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.example.grpc.HotelServiceOuterClass;
+import lombok.Setter;
+import org.example.grpc.HotelEntities;
 
 import javax.persistence.*;
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.stream.Collectors;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class Hotel {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -38,54 +42,6 @@ public class Hotel {
         this.rooms = rooms;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getStars() {
-        return stars;
-    }
-
-    public void setStars(Integer stars) {
-        this.stars = stars;
-    }
-
-    public String getImageFolder() {
-        return imageFolder;
-    }
-
-    public void setImageFolder(String imageFolder) {
-        this.imageFolder = imageFolder;
-    }
-
-    public Position getPosition() {
-        return position;
-    }
-
-    public void setPosition(Position position) {
-        this.position = position;
-    }
-
-    public List<Room> getRooms() {
-        return rooms;
-    }
-
-    public void setRooms(List<Room> rooms) {
-        this.rooms = rooms;
-    }
-
     @Override
     public String toString() {
         return "Hotel{" +
@@ -98,9 +54,8 @@ public class Hotel {
                 '}';
     }
 
-    public HotelServiceOuterClass.Hotel buildGRPC() {
-        System.out.println("HOTEL");
-        HotelServiceOuterClass.Hotel hotel = HotelServiceOuterClass.Hotel.newBuilder()
+    public HotelEntities.Hotel buildGRPC() {
+        return HotelEntities.Hotel.newBuilder()
                 .setId(this.getId())
                 .setName(this.getName())
                 .setStars(this.getStars())
@@ -108,7 +63,5 @@ public class Hotel {
                 .setPosition(this.position.buildRPC())
                 .addAllRooms(rooms.stream().map(Room::buildGRPC).collect(Collectors.toList()))
                 .build();
-        System.out.println("HOTEL");
-        return hotel;
     }
 }

@@ -1,8 +1,10 @@
 package org.example.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.example.grpc.HotelEntities;
 import org.example.grpc.HotelServiceOuterClass;
 
 import javax.persistence.*;
@@ -10,6 +12,8 @@ import javax.persistence.*;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class Position {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -38,64 +42,8 @@ public class Position {
         this.hotel = hotel;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public void setStreet(String street) {
-        this.street = street;
-    }
-
-    public Integer getNumber() {
-        return number;
-    }
-
-    public void setNumber(Integer number) {
-        this.number = number;
-    }
-
-    public String getGps() {
-        return gps;
-    }
-
-    public void setGps(String gps) {
-        this.gps = gps;
-    }
-
-    public Hotel getHotel() {
-        return hotel;
-    }
-
-    public void setHotel(Hotel hotel) {
-        this.hotel = hotel;
-    }
-
-    public HotelServiceOuterClass.Position buildRPC() {
-        return HotelServiceOuterClass.Position.newBuilder()
+    public HotelEntities.Position buildRPC() {
+        return HotelEntities.Position.newBuilder()
                 .setId(this.getId())
                 .setCity(this.getCity())
                 .setCountry(this.getCountry())

@@ -3,7 +3,11 @@ package org.example.models;
 import com.example.grpc.Basics;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.type.DateTime;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.example.grpc.HotelEntities;
 import org.example.grpc.HotelServiceOuterClass;
 
 import javax.persistence.*;
@@ -33,8 +37,8 @@ public class Reservation {
         this.room = room;
     }
 
-    HotelServiceOuterClass.Reservation buildGRPC() {
-        return HotelServiceOuterClass.Reservation.newBuilder()
+    HotelEntities.Reservation buildGRPC() {
+        return HotelEntities.Reservation.newBuilder()
                 .setId(this.id)
                 .setClient(this.client)
                 .setAmount(this.amount)

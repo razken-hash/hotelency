@@ -1,7 +1,10 @@
 package org.example.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.example.grpc.HotelEntities;
 import org.example.grpc.HotelServiceOuterClass;
 
 import javax.persistence.*;
@@ -33,8 +36,8 @@ public class Room {
         this.reservations = reservations;
     }
 
-    public HotelServiceOuterClass.Room buildGRPC() {
-        return HotelServiceOuterClass.Room.newBuilder()
+    public HotelEntities.Room buildGRPC() {
+        return HotelEntities.Room.newBuilder()
                 .setId(this.id)
                 .setNumber(this.number)
                 .setSize(this.size)
