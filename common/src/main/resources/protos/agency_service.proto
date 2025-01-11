@@ -1,23 +1,10 @@
 syntax = "proto3";
 option java_package = "org.example.grpc";
 import "basics.proto";
-import "hotel_service.proto";
+import "agency_entities.proto";
+import "hotel_entities.proto";
 
 service AgencyService {
   rpc getAgencyById(IntegerId) returns (Agency);
   rpc searchRoom(SearchRoomMessage) returns (ManyHotel);
-}
-
-message Agency {
-  int32 id = 1;
-  string name = 2;
-  repeated Offer offers = 3;
-}
-
-message Offer {
-  int32 id = 1;
-  int32 hotel_id = 2;
-  string hotel_uri = 3;
-  double amount = 4;
-  Agency agency = 5;
 }

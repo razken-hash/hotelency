@@ -1,0 +1,57 @@
+syntax = "proto3";
+option java_package = "org.example.grpc";
+import "basics.proto";
+
+message SearchRoomMessage {
+  string position = 1;
+  int32 rating = 2;
+  int32 size = 3;
+  Date dateIn = 4;
+  Date dateOut = 5;
+  double price = 6;
+}
+
+message ManyRoom {
+  repeated Room room = 1;
+}
+
+message ManyHotel {
+  repeated Hotel hotels = 1;
+}
+
+message Hotel {
+  int32 id = 1;
+  string name = 2;
+  optional int32 stars = 3;
+  optional string imagesFolder = 4;
+  Position position = 5;
+  repeated Room rooms= 6;
+}
+
+message Position {
+  int32 id = 1;
+  string city = 2;
+  string country = 3;
+  optional string street = 4;
+  optional int32 number = 5;
+  optional string gps = 6;
+  Hotel hotel = 7;
+}
+
+message Room {
+  int32 id = 1;
+  int32 number = 2;
+  optional int32 size = 3;
+  double price = 4;
+  Hotel hotel = 5;
+  repeated Reservation reservations = 6;
+}
+
+message Reservation {
+  int32 id = 1;
+  optional string client = 2;
+  Date dateIn = 3;
+  optional Date dateOut = 4;
+  double amount = 5;
+  Room room = 6;
+}
