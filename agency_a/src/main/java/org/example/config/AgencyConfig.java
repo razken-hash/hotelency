@@ -17,13 +17,13 @@ public class AgencyConfig {
         return args -> {
             Agency agency = new Agency("RAKUTEN");
             List<Offer> offers = new ArrayList<Offer>();
-            Offer o1 = new Offer(1, "http://localhost:8001/hotel1/api/hotels", 10D, agency);
-            Offer o2 = new Offer(2, "http://localhost:8002/hotel2/api/hotels", 15D, agency);
-            Offer o3 = new Offer(3, "http://localhost:8003/hotel3/api/hotels", 05D, agency);
+            Offer o1 = new Offer(1, 8001, 10D, agency);
+//            Offer o2 = new Offer(1, 8006, 15D, agency);
+//            Offer o3 = new Offer(3, 8003, 05D, agency);
 
             offers.add(o1);
-            offers.add(o2);
-            offers.add(o3);
+//            offers.add(o2);
+//            offers.add(o3);
 
             agency.setOffers(offers);
 

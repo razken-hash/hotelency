@@ -2,11 +2,11 @@ package org.example.models;
 
 import com.example.grpc.Basics;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.type.DateTime;
 import lombok.*;
 import org.example.grpc.HotelEntities;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @AllArgsConstructor
@@ -18,14 +18,14 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
     private String client;
-    private DateTime dateIn;
-    private DateTime dateOut;
+    private LocalDate dateIn;
+    private LocalDate dateOut;
     private Double amount;
     @ManyToOne
     @JsonIgnore
     private Room room;
 
-    public Reservation(String client, DateTime dateIn, DateTime dateOut, Double amount, Room room) {
+    public Reservation(String client, LocalDate dateIn, LocalDate dateOut, Double amount, Room room) {
         this.client = client;
         this.dateIn = dateIn;
         this.dateOut = dateOut;
@@ -33,7 +33,15 @@ public class Reservation {
         this.room = room;
     }
 
-    HotelEntities.Reservation buildGRPC() {
+    public Reservation(Integer id, String client, LocalDate dateIn, LocalDate dateOut, Double amount) {
+        this.id = id;
+        this.client = client;
+        this.dateIn = dateIn;
+        this.dateOut = dateOut;
+        this.amount = amount;
+    }
+
+    public HotelEntities.Reservation buildGRPC() {
         return HotelEntities.Reservation.newBuilder()
                 .setId(this.id)
                 .setClient(this.client)
@@ -41,17 +49,27 @@ public class Reservation {
                 .setDateIn(
                         Basics.Date.newBuilder()
                                 .setYear(this.dateIn.getYear())
-                                .setMonth(this.dateIn.getMonth())
-                                .setDay(this.dateIn.getDay())
+                                .setMonth(this.dateIn.getMonthValue())
+                                .setDay(this.dateIn.getDayOfMonth())
                                 .build()
                 )
                 .setDateOut(
                         Basics.Date.newBuilder()
                                 .setYear(this.dateOut.getYear())
-                                .setMonth(this.dateOut.getMonth())
-                                .setDay(this.dateOut.getDay())
+                                .setMonth(this.dateOut.getMonthValue())
+                                .setDay(this.dateOut.getDayOfMonth())
                                 .build()
                 )
                 .build();
+    }
+
+    static public Reservation fromGRPC(HotelEntities.Reservation grpcReservation) {
+        return new Reservation(
+                grpcReservation.getId(),
+                grpcReservation.getClient(),
+                LocalDate.of(grpcReservation.getDateIn().getYear(), grpcReservation.getDateIn().getMonth(), grpcReservation.getDateIn().getDay()),
+                LocalDate.of(grpcReservation.getDateOut().getYear(), grpcReservation.getDateOut().getMonth(), grpcReservation.getDateOut().getDay()),
+                grpcReservation.getAmount()
+        );
     }
 }

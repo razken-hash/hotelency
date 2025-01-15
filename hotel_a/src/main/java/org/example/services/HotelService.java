@@ -6,23 +6,29 @@ import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.example.grpc.HotelEntities;
 import org.example.grpc.HotelServiceGrpc;
-import org.example.grpc.HotelServiceOuterClass;
 import org.example.models.Hotel;
 import org.example.models.Reservation;
 import org.example.models.Room;
 import org.example.repositories.HotelRepository;
+import org.example.repositories.ReservationRepository;
+import org.example.repositories.RoomRepository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @GrpcService
 public class HotelService extends HotelServiceGrpc.HotelServiceImplBase {
     private final HotelRepository hotelRepository;
+    private final ReservationRepository reservationRepository;
+    private final RoomRepository roomRepository;
 
-    public HotelService(HotelRepository hotelRepository) {
+    public HotelService(HotelRepository hotelRepository, RoomRepository roomRepository, ReservationRepository reservationRepository) {
         this.hotelRepository = hotelRepository;
+        this.roomRepository = roomRepository;
+        this.reservationRepository = reservationRepository;
     }
 
 
@@ -93,15 +99,13 @@ public class HotelService extends HotelServiceGrpc.HotelServiceImplBase {
                     for (Reservation reservation : room.getReservations()) {
                         System.out.println(reservation.getId());
 
-                        LocalDate reservationDateIn = LocalDate.of(reservation.getDateIn().getYear(), reservation.getDateIn().getMonth(), reservation.getDateIn().getDay());
-                        LocalDate reservationDateOut = LocalDate.of(reservation.getDateOut().getYear(), reservation.getDateOut().getMonth(), reservation.getDateOut().getDay());
-                        if (requestedDateIn.isAfter(reservationDateIn)
+                        if (requestedDateIn.isAfter(reservation.getDateIn())
                                 &&
-                                requestedDateIn.isBefore(reservationDateOut)
+                                requestedDateIn.isBefore(reservation.getDateOut())
                                 ||
-                                requestedDateOut.isAfter(reservationDateIn)
+                                requestedDateOut.isAfter(reservation.getDateIn())
                                         &&
-                                        requestedDateOut.isBefore(reservationDateOut)
+                                        requestedDateOut.isBefore(reservation.getDateOut())
                         ) {
                             isOkay = false;
                             continue;
@@ -121,5 +125,21 @@ public class HotelService extends HotelServiceGrpc.HotelServiceImplBase {
             responseObserver.onNext(null);
             responseObserver.onCompleted();
         }
+    }
+
+    @Override
+    public void makeReservation(HotelEntities.Reservation request, StreamObserver<HotelEntities.Reservation> responseObserver) {
+        Room room = roomRepository.findById(request.getRoomId()).get();
+        room.getReservations().add(Reservation.fromGRPC(request));
+        roomRepository.flush();
+
+//        Reservation reservation = Reservation.fromGRPC(request);
+//        reservation.setRoom(Room.fromGRPC(request.getRoom()));
+        List<Reservation> allReservations = roomRepository.findById(request.getRoomId()).get().getReservations().stream().sorted().toList();
+        Reservation newReservation = allReservations.get(allReservations.size() - 1);
+//        System.out.println(newReservation);
+//        System.out.println(newReservation.getId());
+        responseObserver.onNext(newReservation.buildGRPC());
+        responseObserver.onCompleted();
     }
 }

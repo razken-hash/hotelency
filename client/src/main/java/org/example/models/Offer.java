@@ -5,38 +5,46 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.grpc.AgencyEntities;
-import org.example.grpc.AgencyServiceOuterClass;
 
-import javax.persistence.*;
-
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class Offer {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
     private Integer hotelId;
-    private String hotelUri;
+    private Integer hotelPort;
     private Double amount;
-    @ManyToOne
-    @JoinColumn(name="agency_id")
     private Agency agency;
 
-    public Offer(Integer hotelId, String hotelUri, Double amount, Agency agency) {
+    public Offer(Integer id, Integer hotelId, Integer hotelPort, Double amount) {
+        this.id = id;
         this.hotelId = hotelId;
-        this.hotelUri = hotelUri;
+        this.hotelPort = hotelPort;
+        this.amount = amount;
+    }
+
+    public Offer(Integer hotelId, Integer hotelPort, Double amount, Agency agency) {
+        this.hotelId = hotelId;
+        this.hotelPort = hotelPort;
         this.amount = amount;
         this.agency = agency;
+    }
+
+    static public Offer fromGRPC(AgencyEntities.Offer grpcOffer) {
+        return new Offer(
+                grpcOffer.getId(),
+                grpcOffer.getHotelId(),
+                grpcOffer.getHotelPort(),
+                grpcOffer.getAmount()
+        );
     }
 
     public AgencyEntities.Offer buildGRPC() {
         return AgencyEntities.Offer.newBuilder()
                 .setId(this.getId())
                 .setHotelId(this.getHotelId())
-                .setHotelUri(this.getHotelUri())
+                .setHotelPort(this.getHotelPort())
                 .setAmount(this.getAmount())
                 .build();
     }

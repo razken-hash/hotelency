@@ -19,8 +19,8 @@ import java.io.IOException;
         "org.example.models",
         "org.example.config",
 })
-public class Main {
+public class AgencyAServer {
     public static void main(String[] args) throws IOException {
-        SpringApplication.run(Main.class, args);
+        SpringApplication.run(AgencyAServer.class, args);
     }
 }

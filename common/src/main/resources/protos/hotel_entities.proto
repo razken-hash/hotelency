@@ -54,4 +54,6 @@ message Reservation {
   optional Date dateOut = 4;
   double amount = 5;
   Room room = 6;
+  int32 hotelId = 7;
+  int32 roomId = 8;
 }

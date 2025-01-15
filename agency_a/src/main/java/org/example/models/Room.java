@@ -36,18 +36,27 @@ public class Room {
         this.reservations = reservations;
     }
 
+    public Room(Integer id, Integer number, Integer size, Double price, List<Reservation> reservations) {
+        this.id = id;
+        this.number = number;
+        this.size = size;
+        this.price = price;
+        this.reservations = reservations;
+    }
+
+    static public Room fromGRPC(HotelEntities.Room grpcRoom) {
+        return new Room(
+                grpcRoom.getId(),
+                grpcRoom.getNumber(),
+                grpcRoom.getSize(),
+                grpcRoom.getPrice(),
+                grpcRoom.getReservationsList()
+                        .stream()
+                        .map(Reservation::fromGRPC)
+                        .collect(Collectors.toList()));
+    }
+
     public HotelEntities.Room buildGRPC() {
-        return HotelEntities.Room.newBuilder()
-                .setId(this.id)
-                .setNumber(this.number)
-                .setSize(this.size)
-                .setPrice(this.price)
-                .addAllReservations(
-                        reservations
-                                .stream()
-                                .map(Reservation::buildGRPC)
-                                .collect(Collectors.toList())
-                )
-                .build();
+        return HotelEntities.Room.newBuilder().setId(this.id).setNumber(this.number).setSize(this.size).setPrice(this.price).addAllReservations(reservations.stream().map(Reservation::buildGRPC).collect(Collectors.toList())).build();
     }
 }

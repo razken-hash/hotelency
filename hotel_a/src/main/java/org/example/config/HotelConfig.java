@@ -9,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 @Configuration
@@ -20,12 +21,19 @@ public class HotelConfig {
 
             List<Reservation> reservations = new ArrayList<Reservation>();
 
+
             List<Room> rooms = new ArrayList<>(List.of(
-                    new Room(1, 2, 100.0, hotelA, reservations),
-                    new Room(2, 3, 130.0, hotelA, reservations),
-                    new Room(3, 1, 60.0, hotelA, reservations),
-                    new Room(4, 4, 150.0, hotelA, reservations)
+                    new Room(1, 2, 100.0, hotelA, null),
+                    new Room(2, 3, 130.0, hotelA, null),
+                    new Room(3, 1, 60.0, hotelA, null),
+                    new Room(4, 4, 150.0, hotelA, null)
             ));
+
+            for (Room room: rooms) {
+//                reservation.setRoom(room);
+                room.setReservations(new ArrayList<Reservation>());
+                room.getReservations().add(new Reservation( "sd", LocalDate.now(), LocalDate.now(), 1D, null));
+            }
 
             Position position = new Position("Montpelier", "France", "SERGE CLAUDE", 1, "12.123, 123.2423", hotelA);
 

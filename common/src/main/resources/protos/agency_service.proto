@@ -6,5 +6,7 @@ import "hotel_entities.proto";
 
 service AgencyService {
   rpc getAgencyById(IntegerId) returns (Agency);
+  rpc getAllHotels(EmptyMessage) returns (ManyHotel);
   rpc searchRoom(SearchRoomMessage) returns (ManyHotel);
+  rpc makeReservation(Reservation) returns (Reservation);
 }

@@ -18,7 +18,8 @@
     <modules>
         <module>common</module>
         <module>hotel_a</module>
-        <module>agency</module>
+        <module>agency_a</module>
+        <module>client</module>
     </modules>
 
     <properties>

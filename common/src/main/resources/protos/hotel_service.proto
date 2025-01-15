@@ -7,4 +7,5 @@ service HotelService {
   rpc getAllHotels(EmptyMessage) returns (ManyHotel);
   rpc getHotelById(IntegerId) returns (Hotel);
   rpc searchRoom(SearchRoomMessage) returns (Hotel);
+  rpc makeReservation(Reservation) returns (Reservation);
 }
