@@ -2,6 +2,7 @@ package org.example.cli;
 
 import org.example.exceptions.ReservationException;
 import org.example.functions.MainFunctions;
+import org.example.gui.ClientGUI;
 import org.example.models.Agency;
 import org.example.models.Hotel;
 import org.example.models.Reservation;
@@ -11,6 +12,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,16 +34,16 @@ public class ComparatorClientServiceCLI extends AbstractMain implements CommandL
             int choice = Integer.parseInt(inputReader.readLine());
             if (choice == 1) {
                 System.out.println("GUI");
-//                EventQueue.invokeLater(new Runnable() {
-//                    public void run() {
-//                        try {
-//                            ClientGUI frame = new ClientGUI(proxy);
-//                            frame.setVisible(true);
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                });
+                EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        try {
+                            ClientGUI frame = new ClientGUI();
+                            frame.setVisible(true);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
             } else {
                 do {
                     menu();
@@ -79,26 +81,23 @@ public class ComparatorClientServiceCLI extends AbstractMain implements CommandL
                     break;
 
                 case "2":
-//                    System.out.println("Choisir destination ? (City or country)\n");
-//                    String position = reader.readLine();
-//                    System.out.println("\nNombre Etoile: ");
-//                    Integer rating = Integer.parseInt(reader.readLine());
-//                    System.out.println("\nPrice: ");
-//                    Double price = Double.parseDouble(reader.readLine());
-//                    System.out.println("\nDate Entree (yyyy-mm-dd): ");
-//                    String stringDateIn = reader.readLine();
-//                    LocalDate dateIn = LocalDate.parse(stringDateIn);
-//                    System.out.println("\nDate Sortie (yyyy-mm-dd): ");
-//                    String stringDateOut = reader.readLine();
-//                    LocalDate dateOut = LocalDate.parse(stringDateOut);
-//                    System.out.println("\nNombre de personnes: ");
-//                    int size = Integer.parseInt(reader.readLine());
+                    System.out.println("Choisir destination ? (City or country)\n");
+                    String position = reader.readLine();
+                    System.out.println("\nNombre Etoile: ");
+                    Integer rating = Integer.parseInt(reader.readLine());
+                    System.out.println("\nPrice: ");
+                    Double price = Double.parseDouble(reader.readLine());
+                    System.out.println("\nDate Entree (yyyy-mm-dd): ");
+                    String stringDateIn = reader.readLine();
+                    LocalDate dateIn = LocalDate.parse(stringDateIn);
+                    System.out.println("\nDate Sortie (yyyy-mm-dd): ");
+                    String stringDateOut = reader.readLine();
+                    LocalDate dateOut = LocalDate.parse(stringDateOut);
+                    System.out.println("\nNombre de personnes: ");
+                    int size = Integer.parseInt(reader.readLine());
 
-//                    List<Hotel> searchedHotels = ClientService.searchRooms(
-//                            position, rating, dateIn, dateOut, size, price
-//                    );
                     List<Hotel> searchedHotels = ClientService.searchRooms(
-                            "France", 2,  LocalDate.of(2025, 12, 12), LocalDate.of(2025, 12, 20), 2, 200D
+                            position, rating, dateIn, dateOut, size, price
                     );
 
                     System.out.println("RESULTS:");
@@ -144,17 +143,23 @@ public class ComparatorClientServiceCLI extends AbstractMain implements CommandL
                         }
                     }
 
+                    System.out.println("HELLO");
 
                     if (hotelChoice != 0 && roomChoice != 0) {
                         try {
                             Hotel selectedHotel = searchedHotels.get(hotelChoice - 1);
                             Room selectedRoom = selectedHotel.getRooms().get(roomChoice - 1);
 
-//                            selectedRoom.setHotel(selectedHotel);
+                            selectedRoom.setHotel(selectedHotel);
+                            System.out.println("HELLO");
+
 
                             Reservation reservation = MainFunctions.makeReservation(reader, LocalDate.of(2025, 12, 12), LocalDate.of(2025, 12, 20), selectedRoom);
+                            reservation.setRoomId(selectedRoom.getId());
                             reservation.setHotelId(selectedHotel.getId());
-                            reservation.setRoomId(selectedHotel.getId());
+
+                            System.out.println("ID" + reservation.getRoomId());
+                            System.out.println("ID" + reservation.getHotelId());
                             ClientService.makeReservation(reservation);
 
                             System.out.println("Thank you !\n");

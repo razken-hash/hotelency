@@ -4,6 +4,7 @@ import org.example.functions.MainFunctions;
 import org.example.models.Hotel;
 import org.example.models.Reservation;
 import org.example.models.Room;
+import org.example.services.ClientService;
 import org.springframework.web.client.RestTemplate;
 
 import javax.swing.*;
@@ -13,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
@@ -34,7 +36,7 @@ public class ClientGUI extends JFrame {
     private JTextField cardExpirationReservation;
 
 
-    public ClientGUI(RestTemplate proxy) {
+    public ClientGUI() {
         setResizable(false);
 
         setTitle("Comparateur");
@@ -605,8 +607,7 @@ public class ClientGUI extends JFrame {
                 HashMap<Hotel, HashMap<String, Double>> hotelMap = new HashMap<>();
                 for (String uri : URIS.keySet()) {
                     try {
-                        String url = uri + "/search?position={position}&size={size}&rating={rating}&datein={datein}&dateout={dateout}&price={price}";
-                        Hotel[] returnedHotel = proxy.getForObject(url, Hotel[].class, params);
+                        List<Hotel> returnedHotel = ClientService.searchRooms(destination, stars , LocalDate.parse(DateIn) , LocalDate.parse(DateOut), bedNumber, Double.valueOf(price));
                         for (Hotel hotel : returnedHotel) {
                             if (!hotel.getName().equals("Undefined")) {
                                 HashMap<String, Double> agencyMap = new HashMap<>();
@@ -965,7 +966,7 @@ public class ClientGUI extends JFrame {
                 for (String uri : URIS.keySet()) {
                     try {
                         String url = uri + "/search?position={position}&size={size}&rating={rating}&datein={datein}&dateout={dateout}&price={price}";
-                        Hotel[] returnedHotel = proxy.getForObject(url, Hotel[].class, params);
+                        List<Hotel> returnedHotel = ClientService.getAllHotels();
                         for (Hotel hotel : returnedHotel) {
                             if (!hotel.getName().equals("Undefined")) {
                                 HashMap<String, Double> agencyMap = new HashMap<>();
@@ -1049,7 +1050,7 @@ public class ClientGUI extends JFrame {
                     }
                 }
                 String url = agencyURI + "/resa/" + String.valueOf(selectedHotel.getId());
-                proxy.put(url, selectedHotel);
+//                proxy.put(url, selectedHotel);
                 MainFunctions.getRecipe(selectedHotel, reservation.getClient(), reservation);
                 MainFunctions.makePdf(selectedHotel, reservation.getClient(), reservation);
 

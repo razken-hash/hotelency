@@ -23,16 +23,16 @@ public class MainFunctions {
             String firstName = reader.readLine();
             System.out.println("Name: ");
             String lastName = reader.readLine();
-//            System.out.println("E-mail: ");
-//            String mail = reader.readLine();
-//            System.out.println("Phone number: ");
-//            String phone = reader.readLine();
-//            System.out.println("Card number: ");
-//            String num = reader.readLine();
-//            System.out.println("CVC number: ");
-//            String cvv = reader.readLine();
-//            System.out.println("Expiration date (yyyy-mm-dd): ");
-//            LocalDate exp = LocalDate.parse(reader.readLine());
+            System.out.println("E-mail: ");
+            String mail = reader.readLine();
+            System.out.println("Phone number: ");
+            String phone = reader.readLine();
+            System.out.println("Card number: ");
+            String num = reader.readLine();
+            System.out.println("CVC number: ");
+            String cvv = reader.readLine();
+            System.out.println("Expiration date (yyyy-mm-dd): ");
+            LocalDate exp = LocalDate.parse(reader.readLine());
             resa = new Reservation(
                     firstName + " " + lastName,
                     dateIn,
@@ -40,6 +40,8 @@ public class MainFunctions {
                     room.getPrice(),
                     room
             );
+            resa.setHotelId(room.getHotel().getId());
+            resa.setRoomId(room.getId());
         } catch (Exception e) {
             e.printStackTrace();
         }

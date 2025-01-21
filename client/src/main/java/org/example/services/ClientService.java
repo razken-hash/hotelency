@@ -126,7 +126,7 @@ public class ClientService {
             HotelEntities.ManyHotel agencyHotels = stub.searchRoom(searchRoomQuery);
             for (HotelEntities.Hotel grpcHotel : agencyHotels.getHotelsList()) {
                 Hotel hotel = Hotel.fromGRPC(grpcHotel);
-                hotel.setId(searchedHotels.size() + 1);
+                hotel.setSequentialId(searchedHotels.size() + 1);
                 hotel.setAgencyPort(agencyPort);
                 searchedHotels.add(hotel);
             }
@@ -146,6 +146,8 @@ public class ClientService {
         AgencyServiceGrpc.AgencyServiceBlockingStub stub = AgencyServiceGrpc.newBlockingStub(channel);
 
         HotelEntities.Reservation newReservation = stub.makeReservation(reservation.buildGRPC());
+
+        channel.shutdown();
 
         if (newReservation != null) {
             return Reservation.fromGRPC(newReservation);

@@ -183,10 +183,10 @@ public class Reservation {
             reservationBuilder.setId(this.id);
         }
         if (this.hotelId != null) {
-            reservationBuilder.setId(this.hotelId);
+            reservationBuilder.setHotelId(this.hotelId);
         }
         if (this.roomId != null) {
-            reservationBuilder.setId(this.roomId);
+            reservationBuilder.setRoomId(this.roomId);
         }
         if (this.room != null) {
             reservationBuilder.setRoom(room.buildGRPC());

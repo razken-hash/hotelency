@@ -32,7 +32,7 @@ public class HotelConfig {
             for (Room room: rooms) {
 //                reservation.setRoom(room);
                 room.setReservations(new ArrayList<Reservation>());
-                room.getReservations().add(new Reservation( "sd", LocalDate.now(), LocalDate.now(), 1D, null));
+//                room.getReservations().add(new Reservation( "sd", LocalDate.now(), LocalDate.now(), 1D, null));
             }
 
             Position position = new Position("Montpelier", "France", "SERGE CLAUDE", 1, "12.123, 123.2423", hotelA);

@@ -12,6 +12,7 @@ import org.example.models.Room;
 import org.example.repositories.HotelRepository;
 import org.example.repositories.ReservationRepository;
 import org.example.repositories.RoomRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -127,19 +128,34 @@ public class HotelService extends HotelServiceGrpc.HotelServiceImplBase {
         }
     }
 
-    @Override
-    public void makeReservation(HotelEntities.Reservation request, StreamObserver<HotelEntities.Reservation> responseObserver) {
-        Room room = roomRepository.findById(request.getRoomId()).get();
-        room.getReservations().add(Reservation.fromGRPC(request));
-        roomRepository.flush();
-
+//    @Transactional
+//    public Room addReservation(Integer roomId, Reservation reservation) {
+//        Room room = roomRepository.getReferenceById(roomId);
+//        room.getReservations().add(reservation);
+//        return room;
+//    }
+//
+//    @Override
+//    public void makeReservation(HotelEntities.Reservation request, StreamObserver<HotelEntities.Reservation> responseObserver) {
 //        Reservation reservation = Reservation.fromGRPC(request);
-//        reservation.setRoom(Room.fromGRPC(request.getRoom()));
-        List<Reservation> allReservations = roomRepository.findById(request.getRoomId()).get().getReservations().stream().sorted().toList();
-        Reservation newReservation = allReservations.get(allReservations.size() - 1);
-//        System.out.println(newReservation);
-//        System.out.println(newReservation.getId());
-        responseObserver.onNext(newReservation.buildGRPC());
+//        Reservation newReservation = reservationRepository.save(reservation);
+//        addReservation(request.getRoomId(), newReservation);
+////        roomRepository.addReservation(room, newReservation);
+//        responseObserver.onNext(newReservation.buildGRPC());
+//        responseObserver.onCompleted();
+//    }
+
+    @Transactional
+    public void makeReservation(HotelEntities.Reservation request, StreamObserver<HotelEntities.Reservation> responseObserver) {
+        Room room = roomRepository.getReferenceById(request.getRoomId());
+        Reservation reservation = Reservation.fromGRPC(request);
+        reservation.setRoom(room);
+
+        Reservation savedReservation = reservationRepository.save(reservation);
+        room.getReservations().add(savedReservation);
+//        roomRepository.save(room);
+                responseObserver.onNext(reservation.buildGRPC());
         responseObserver.onCompleted();
+
     }
 }

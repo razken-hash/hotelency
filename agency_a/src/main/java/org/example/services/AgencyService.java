@@ -94,8 +94,10 @@ public class AgencyService extends AgencyServiceGrpc.AgencyServiceImplBase {
 
     @Override
     public void makeReservation(HotelEntities.Reservation request, StreamObserver<HotelEntities.Reservation> responseObserver) {
+        System.out.println("LLLLL");
+        System.out.println("ID" + request.getHotelId());
+        System.out.println("ROOM ID" + request.getRoomId());
         System.out.println("HHHHHHH");
-
         Agency agency = agencyRepository.findById(1).orElseThrow();
         System.out.println("HHHHHHH");
 
