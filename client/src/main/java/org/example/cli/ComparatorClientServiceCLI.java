@@ -46,6 +46,9 @@ public class ComparatorClientServiceCLI extends AbstractMain implements CommandL
                 });
             } else {
                 do {
+                    ClientService.agenciesPorts.put("Agency A", 7001);
+//                    ClientService.agenciesPorts.put("Agency B", 7002);
+//                    ClientService.agenciesPorts.put("Agency C", 7003);
                     menu();
                     userInput = inputReader.readLine();
                     processUserInput(inputReader, userInput);
@@ -154,7 +157,7 @@ public class ComparatorClientServiceCLI extends AbstractMain implements CommandL
                             System.out.println("HELLO");
 
 
-                            Reservation reservation = MainFunctions.makeReservation(reader, LocalDate.of(2025, 12, 12), LocalDate.of(2025, 12, 20), selectedRoom);
+                            Reservation reservation = MainFunctions.makeReservation(reader, dateIn, dateOut, selectedRoom);
                             reservation.setRoomId(selectedRoom.getId());
                             reservation.setHotelId(selectedHotel.getId());
 

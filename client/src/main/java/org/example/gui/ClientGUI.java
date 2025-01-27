@@ -5,7 +5,6 @@ import org.example.models.Hotel;
 import org.example.models.Reservation;
 import org.example.models.Room;
 import org.example.services.ClientService;
-import org.springframework.web.client.RestTemplate;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -20,6 +19,15 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 public class ClientGUI extends JFrame {
+
+    private String destination = "";
+    private String personNum = "";
+    private String prce = "";
+    private String DateIn = "";
+    private String DateOut = "";
+
+    Hotel selectedH = null;
+    Room selectedR = null;
 
     private JPanel contentPane;
     private JTextField destinationInput;
@@ -37,7 +45,7 @@ public class ClientGUI extends JFrame {
 
 
     public ClientGUI() {
-        setResizable(false);
+        setResizable(true);
 
         setTitle("Comparateur");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -74,6 +82,20 @@ public class ClientGUI extends JFrame {
         reservedHotel.setBounds(410, 243, 300, 24);
         contentPane.add(reservedHotel);
         reservedHotel.setVisible(false);
+
+        JLabel dateInInfo = new JLabel();
+        dateInInfo.setHorizontalAlignment(SwingConstants.CENTER);
+        dateInInfo.setForeground(Color.BLACK);
+        dateInInfo.setFont(new Font("Tahoma", Font.BOLD, 20));
+        dateInInfo.setBounds(410, 388, 300, 24);
+        contentPane.add(dateInInfo);
+
+        JLabel dateOutInfo = new JLabel("");
+        dateOutInfo.setHorizontalAlignment(SwingConstants.CENTER);
+        dateOutInfo.setForeground(Color.BLACK);
+        dateOutInfo.setFont(new Font("Tahoma", Font.BOLD, 20));
+        dateOutInfo.setBounds(410, 432, 300, 24);
+        contentPane.add(dateOutInfo);
 
         JLabel roomNumber = new JLabel("");
         roomNumber.setEnabled(false);
@@ -550,164 +572,139 @@ public class ClientGUI extends JFrame {
 
         searchButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                String SERVICE_URL1 = "http://localhost:5009/agence3/api/";
-                String SERVICE_URL2 = "http://localhost:5007/agence1/api/";
-                String SERVICE_URL3 = "http://localhost:5008/agence2/api/";
+
                 boolean BestRatePriceDisplay = false;
 
-                String URI_HOTEL = "agency";
-                String URI_HOTEL_ID = URI_HOTEL + "/{id}";
-                Map<String, String> URIS = new HashMap<String, String>();
-
-                String destination = destinationInput.getText();
-                String personNum = personNumberInput.getText();
-                String prce = priceSelectedMax.getText();
-                String DateIn = dateIn.getText();
-                String DateOut = dateOut.getText();
+                destination = destinationInput.getText();
+                personNum = personNumberInput.getText();
+                prce = priceSelectedMax.getText();
+                DateIn = dateIn.getText();
+                DateOut = dateOut.getText();
                 int price = Integer.valueOf(prce);
-                ;
                 int bedNumber = Integer.valueOf(personNum);
                 int stars = starsSelector.getSelectedIndex() + 1;
-                Map<String, String> params = new HashMap<>();
-                params.put("position", destination);
-                params.put("datein", DateIn);
-                params.put("dateout", DateOut);
-                params.put("size", String.valueOf(bedNumber));
-                params.put("rating", String.valueOf(stars));
-                params.put("price", String.valueOf(price));
+//                Map<String, String> params = new HashMap<>();
+//                params.put("position", destination);
+//                params.put("datein", DateIn);
+//                params.put("dateout", DateOut);
+//                params.put("size", String.valueOf(bedNumber));
+//                params.put("rating", String.valueOf(stars));
+//                params.put("price", String.valueOf(price));
 
-                if (AgencyCheck1.isSelected() && AgencyCheck2.isSelected() && AgencyCheck3.isSelected()) {
-                    URIS.put(SERVICE_URL1 + URI_HOTEL, SERVICE_URL1 + URI_HOTEL + URI_HOTEL_ID);
-                    URIS.put(SERVICE_URL2 + URI_HOTEL, SERVICE_URL2 + URI_HOTEL + URI_HOTEL_ID);
-                    URIS.put(SERVICE_URL3 + URI_HOTEL, SERVICE_URL3 + URI_HOTEL + URI_HOTEL_ID);
-                    BestRatePriceDisplay = true;
-                } else if (AgencyCheck1.isSelected() && AgencyCheck2.isSelected() && !(AgencyCheck3.isSelected())) {
-                    URIS.put(SERVICE_URL1 + URI_HOTEL, SERVICE_URL1 + URI_HOTEL + URI_HOTEL_ID);
-                    URIS.put(SERVICE_URL2 + URI_HOTEL, SERVICE_URL2 + URI_HOTEL + URI_HOTEL_ID);
-                    BestRatePriceDisplay = true;
-                } else if (AgencyCheck1.isSelected() && !(AgencyCheck2.isSelected()) && AgencyCheck3.isSelected()) {
-                    URIS.put(SERVICE_URL1 + URI_HOTEL, SERVICE_URL1 + URI_HOTEL + URI_HOTEL_ID);
-                    URIS.put(SERVICE_URL3 + URI_HOTEL, SERVICE_URL3 + URI_HOTEL + URI_HOTEL_ID);
-                    BestRatePriceDisplay = true;
-                } else if (!(AgencyCheck1.isSelected()) && AgencyCheck2.isSelected() && AgencyCheck3.isSelected()) {
-                    URIS.put(SERVICE_URL2 + URI_HOTEL, SERVICE_URL2 + URI_HOTEL + URI_HOTEL_ID);
-                    URIS.put(SERVICE_URL3 + URI_HOTEL, SERVICE_URL3 + URI_HOTEL + URI_HOTEL_ID);
-                    BestRatePriceDisplay = true;
-                } else if (AgencyCheck1.isSelected() && !(AgencyCheck2.isSelected()) && !(AgencyCheck3.isSelected())) {
-                    URIS.put(SERVICE_URL1 + URI_HOTEL, SERVICE_URL1 + URI_HOTEL + URI_HOTEL_ID);
-                    BestRatePriceDisplay = false;
-                } else if (!(AgencyCheck1.isSelected()) && AgencyCheck2.isSelected() && !(AgencyCheck3.isSelected())) {
-                    URIS.put(SERVICE_URL2 + URI_HOTEL, SERVICE_URL2 + URI_HOTEL + URI_HOTEL_ID);
-                    BestRatePriceDisplay = false;
-                } else if (!(AgencyCheck1.isSelected()) && !(AgencyCheck2.isSelected()) && AgencyCheck3.isSelected()) {
-                    URIS.put(SERVICE_URL3 + URI_HOTEL, SERVICE_URL3 + URI_HOTEL + URI_HOTEL_ID);
-                    BestRatePriceDisplay = false;
+                ClientService.agenciesPorts.clear();
+                if (AgencyCheck1.isSelected()) {
+                    ClientService.agenciesPorts.put("Agency A", 7001);
                 }
+                if (AgencyCheck2.isSelected()) {
+                    ClientService.agenciesPorts.put("Agency B", 7002);
+                }
+                if (AgencyCheck3.isSelected()) {
+                    ClientService.agenciesPorts.put("Agency C", 7003);
+                }
+                List<Hotel> returnedHotel = ClientService.searchRooms(destination, stars, LocalDate.parse(DateIn), LocalDate.parse(DateOut), bedNumber, Double.valueOf(price));
 
-                HashMap<Hotel, HashMap<String, Double>> hotelMap = new HashMap<>();
-                for (String uri : URIS.keySet()) {
-                    try {
-                        List<Hotel> returnedHotel = ClientService.searchRooms(destination, stars , LocalDate.parse(DateIn) , LocalDate.parse(DateOut), bedNumber, Double.valueOf(price));
-                        for (Hotel hotel : returnedHotel) {
-                            if (!hotel.getName().equals("Undefined")) {
-                                HashMap<String, Double> agencyMap = new HashMap<>();
-                                int lastIndex = hotel.getImageFolder().lastIndexOf("/");
-                                double discount = 10.0;
-                                agencyMap.put(uri, discount);
-                                //hotel.setImageFolder(hotel.getImageFolder().substring(0,lastIndex));
-                                hotelMap.put(hotel, agencyMap);
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                for (int i = 0; i < hotelMap.size(); i++) {
-                    for (int j = 0; j < hotelMap.size(); j++) {
-                        if (i != j) {
-                            try {
-                                Hotel hotel = (Hotel) hotelMap.keySet().toArray()[i];
-                                Hotel toCompare = (Hotel) hotelMap.keySet().toArray()[j];
-                                HashMap<String, Double> agency1 = hotelMap.get(hotel);
-                                String agencyUrl1 = (String) agency1.keySet().toArray()[0];
-                                double discount1 = agency1.get(agencyUrl1);
-                                if (hotel.getName().equals(toCompare.getName())) {
-                                    HashMap<String, Double> agency2 = hotelMap.get(toCompare);
-                                    String agencyUrl2 = (String) agency2.keySet().toArray()[0];
-                                    double discount2 = agency2.get(agencyUrl2);
-                                    if (discount1 >= discount2) {
-                                        hotelMap.remove(toCompare);
-                                    }
-                                }
-                            } catch (Exception e) {
-                                continue;
-                            }
-                        }
-                    }
-
-                }
+//                HashMap<Hotel, HashMap<String, Double>> hotelMap = new HashMap<>();
+//                    try {
+//                        List<Hotel> returnedHotel = ClientService.searchRooms(destination, stars , LocalDate.parse(DateIn) , LocalDate.parse(DateOut), bedNumber, Double.valueOf(price));
+//                        for (Hotel hotel : returnedHotel) {
+//                            if (!hotel.getName().equals("Undefined")) {
+//                                HashMap<String, Double> agencyMap = new HashMap<>();
+//                                int lastIndex = hotel.getImageFolder().lastIndexOf("/");
+//                                double discount = 10.0;
+//                                agencyMap.put(uri, discount);
+//                                //hotel.setImageFolder(hotel.getImageFolder().substring(0,lastIndex));
+//                                hotelMap.put(hotel, agencyMap);
+//                            }
+//                        }
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                for (int i = 0; i < returnedHotel.size(); i++) {
+//                    for (int j = 0; j < hotelMap.size(); j++) {
+//                        if (i != j) {
+//                            try {
+//                                Hotel hotel = (Hotel) hotelMap.keySet().toArray()[i];
+//                                Hotel toCompare = (Hotel) hotelMap.keySet().toArray()[j];
+//                                HashMap<String, Double> agency1 = hotelMap.get(hotel);
+//                                String agencyUrl1 = (String) agency1.keySet().toArray()[0];
+//                                double discount1 = agency1.get(agencyUrl1);
+//                                if (hotel.getName().equals(toCompare.getName())) {
+//                                    HashMap<String, Double> agency2 = hotelMap.get(toCompare);
+//                                    String agencyUrl2 = (String) agency2.keySet().toArray()[0];
+//                                    double discount2 = agency2.get(agencyUrl2);
+//                                    if (discount1 >= discount2) {
+//                                        hotelMap.remove(toCompare);
+//                                    }
+//                                }
+//                            } catch (Exception e) {
+//                                continue;
+//                            }
+//                        }
+//                    }
+//
+//                }
 
                 double bestPrice = 1000;
                 String bestPriceHotel = "Aucune info";
                 double BestRate = 0;
                 String bestRateHotel = "Aucune info";
+//
+//                for (Hotel key : hotelMap.keySet()) {
+//                    if (key.getStars() > BestRate) {
+//                        BestRate = key.getStars();
+//                        bestRateHotel = key.getName();
+//                    }
+//                    for (Room room : key.getRooms()) {
+//                        if (room.getPrice() < bestPrice) {
+//                            bestPrice = room.getPrice();
+//                            bestPriceHotel = key.getName();
+//                        }
+//                    }
+//                }
 
-                for (Hotel key : hotelMap.keySet()) {
-                    if (key.getStars() > BestRate) {
-                        BestRate = key.getStars();
-                        bestRateHotel = key.getName();
-                    }
-                    for (Room room : key.getRooms()) {
-                        if (room.getPrice() < bestPrice) {
-                            bestPrice = room.getPrice();
-                            bestPriceHotel = key.getName();
-                        }
-                    }
-                }
-
-                bestPriceAgence.setText(bestPriceHotel);
-                bestRateAgence.setText(bestRateHotel);
-                bestPricePrix.setText(String.valueOf(bestPrice) + "€");
-                bestRateStars.setText(String.valueOf(BestRate));
+                bestPriceAgence.setText(returnedHotel.get(0).getName());
+                bestRateAgence.setText(ClientService.agenciesPorts.keySet().stream().toList().get(0));
+                bestPricePrix.setText(returnedHotel.get(0).getRooms().get(0).getPrice().toString() + "€");
+                bestRateStars.setText(String.valueOf(returnedHotel.get(0).getStars().toString()));
 
 
                 String firstHotel = null;
-                if (!(hotelMap.isEmpty())) {
-                    Hotel firstHotelValue = (Hotel) hotelMap.keySet().toArray()[0];
+                if (!(returnedHotel.isEmpty())) {
+                    Hotel firstHotelValue = (Hotel) returnedHotel.get(0);
 
                 }
-
-                for (Hotel hotel : hotelMap.keySet()) {
+                hotelChoice.removeAllItems();
+                for (Hotel hotel : returnedHotel) {
                     hotelChoice.addItem(hotel.getName());
                 }
                 roomChoice.removeAllItems();
-                Hotel selectedH = null;
-                Room selectedR = null;
+                 selectedH = null;
+                 selectedR = null;
                 String selectedHotel = (String) hotelChoice.getSelectedItem();
-                for (Hotel key : hotelMap.keySet()) {
-                    if (key.getName().equals(selectedHotel)) {
-                        for (Room room : key.getRooms()) {
-                            roomChoice.addItem(room);
-                            selectedH = key;
-                            selectedR = room;
+                for (Hotel hotel : returnedHotel) {
+                    if (hotel.getName().equals(selectedHotel)) {
+                        for (Room room : hotel.getRooms()) {
+                            roomChoice.addItem("Room " + room.getNumber().toString());
                         }
+                        selectedR = hotel.getRooms().get(0);
+                        selectedH = hotel;
                     }
                 }
 
                 hotelChoice.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         String selectedHotel = (String) hotelChoice.getSelectedItem();
-                        roomChoice.removeAllItems();
 
-                        for (Hotel key : hotelMap.keySet()) {
-                            if (key.getName().equals(selectedHotel)) {
+                        for (Hotel hotel : returnedHotel) {
+                            if (hotel.getName().equals(selectedHotel)) {
                                 hotelName.setText((String) hotelChoice.getSelectedItem());
-                                for (Room room : key.getRooms()) {
-                                    roomChoice.addItem(room);
-                                    roomNumberDisplay.setText(String.valueOf(room.getNumber()));
-                                    roomPriceDisplay.setText(String.valueOf(room.getPrice()) + "€");
-                                    roomSizeDisplay.setText(String.valueOf(room.getSize()) + " personne(s)");
 
+                                roomNumberDisplay.setText(String.valueOf(hotel.getRooms().get(0).getNumber()));
+                                roomPriceDisplay.setText(String.valueOf(hotel.getRooms().get(0).getPrice()) + "€");
+                                roomSizeDisplay.setText(String.valueOf(hotel.getRooms().get(0).getSize()) + " personne(s)");
+                                roomChoice.removeAllItems();
+                                for (Room room : hotel.getRooms()) {
+                                    roomChoice.addItem("Room " + room.getNumber().toString());
                                 }
                             }
                         }
@@ -728,10 +725,10 @@ public class ClientGUI extends JFrame {
                             number = m.group(1);
                         }
 
-                        for (Hotel key : hotelMap.keySet()) {
-                            if (key.getName().equals(selectedHotel)) {
-                                for (Room room : key.getRooms()) {
-                                    if (room.getNumber() == (Integer.parseInt(number))) {
+                        for (Hotel hotel : returnedHotel) {
+                            if (hotel.getName().equals(selectedHotel)) {
+                                for (Room room : hotel.getRooms()) {
+                                    if (("Room " + room.getNumber().toString()).equals(selectedRoom)) {
                                         roomNumberDisplay.setText(String.valueOf(room.getNumber()));
                                         roomPriceDisplay.setText(String.valueOf(room.getPrice()) + "€");
                                         roomSizeDisplay.setText(String.valueOf(room.getSize()) + " personne(s)");
@@ -908,151 +905,13 @@ public class ClientGUI extends JFrame {
 
         payBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String SERVICE_URL1 = "http://localhost:5009/agence3/api/";
-                String SERVICE_URL2 = "http://localhost:5007/agence1/api/";
-                String SERVICE_URL3 = "http://localhost:5008/agence2/api/";
-                boolean BestRatePriceDisplay = false;
+                Reservation reservation = new Reservation(reservationFirstName.getText() + " " + reservationName.getText(), LocalDate.parse(DateIn), LocalDate.parse(DateOut),selectedR.getPrice() ,selectedR);
+                reservation.setHotelId(selectedH.getId());
+                reservation.setRoomId(selectedR.getId());
+               Reservation newReservation = ClientService.makeReservation(reservation);
 
-                String URI_HOTEL = "agency";
-                String URI_HOTEL_ID = URI_HOTEL + "/{id}";
-                Map<String, String> URIS = new HashMap<String, String>();
-
-                String destination = destinationInput.getText();
-                String personNum = personNumberInput.getText();
-                String prce = priceSelectedMax.getText();
-                String DateIn = dateIn.getText();
-                String DateOut = dateOut.getText();
-                int price = Integer.valueOf(prce);
-                ;
-                int bedNumber = Integer.valueOf(personNum);
-                int stars = starsSelector.getSelectedIndex() + 1;
-                Map<String, String> params = new HashMap<>();
-                params.put("position", destination);
-                params.put("datein", DateIn);
-                params.put("dateout", DateOut);
-                params.put("size", String.valueOf(bedNumber));
-                params.put("rating", String.valueOf(stars));
-                params.put("price", String.valueOf(price));
-
-                if (AgencyCheck1.isSelected() && AgencyCheck2.isSelected() && AgencyCheck3.isSelected()) {
-                    URIS.put(SERVICE_URL1 + URI_HOTEL, SERVICE_URL1 + URI_HOTEL + URI_HOTEL_ID);
-                    URIS.put(SERVICE_URL2 + URI_HOTEL, SERVICE_URL2 + URI_HOTEL + URI_HOTEL_ID);
-                    URIS.put(SERVICE_URL3 + URI_HOTEL, SERVICE_URL3 + URI_HOTEL + URI_HOTEL_ID);
-                    BestRatePriceDisplay = true;
-                } else if (AgencyCheck1.isSelected() && AgencyCheck2.isSelected() && !(AgencyCheck3.isSelected())) {
-                    URIS.put(SERVICE_URL1 + URI_HOTEL, SERVICE_URL1 + URI_HOTEL + URI_HOTEL_ID);
-                    URIS.put(SERVICE_URL2 + URI_HOTEL, SERVICE_URL2 + URI_HOTEL + URI_HOTEL_ID);
-                    BestRatePriceDisplay = true;
-                } else if (AgencyCheck1.isSelected() && !(AgencyCheck2.isSelected()) && AgencyCheck3.isSelected()) {
-                    URIS.put(SERVICE_URL1 + URI_HOTEL, SERVICE_URL1 + URI_HOTEL + URI_HOTEL_ID);
-                    URIS.put(SERVICE_URL3 + URI_HOTEL, SERVICE_URL3 + URI_HOTEL + URI_HOTEL_ID);
-                    BestRatePriceDisplay = true;
-                } else if (!(AgencyCheck1.isSelected()) && AgencyCheck2.isSelected() && AgencyCheck3.isSelected()) {
-                    URIS.put(SERVICE_URL2 + URI_HOTEL, SERVICE_URL2 + URI_HOTEL + URI_HOTEL_ID);
-                    URIS.put(SERVICE_URL3 + URI_HOTEL, SERVICE_URL3 + URI_HOTEL + URI_HOTEL_ID);
-                    BestRatePriceDisplay = true;
-                } else if (AgencyCheck1.isSelected() && !(AgencyCheck2.isSelected()) && !(AgencyCheck3.isSelected())) {
-                    URIS.put(SERVICE_URL1 + URI_HOTEL, SERVICE_URL1 + URI_HOTEL + URI_HOTEL_ID);
-                    BestRatePriceDisplay = false;
-                } else if (!(AgencyCheck1.isSelected()) && AgencyCheck2.isSelected() && !(AgencyCheck3.isSelected())) {
-                    URIS.put(SERVICE_URL2 + URI_HOTEL, SERVICE_URL2 + URI_HOTEL + URI_HOTEL_ID);
-                    BestRatePriceDisplay = false;
-                } else if (!(AgencyCheck1.isSelected()) && !(AgencyCheck2.isSelected()) && AgencyCheck3.isSelected()) {
-                    URIS.put(SERVICE_URL3 + URI_HOTEL, SERVICE_URL3 + URI_HOTEL + URI_HOTEL_ID);
-                    BestRatePriceDisplay = false;
-                }
-
-                HashMap<Hotel, HashMap<String, Double>> hotelMap = new HashMap<>();
-                for (String uri : URIS.keySet()) {
-                    try {
-                        String url = uri + "/search?position={position}&size={size}&rating={rating}&datein={datein}&dateout={dateout}&price={price}";
-                        List<Hotel> returnedHotel = ClientService.getAllHotels();
-                        for (Hotel hotel : returnedHotel) {
-                            if (!hotel.getName().equals("Undefined")) {
-                                HashMap<String, Double> agencyMap = new HashMap<>();
-                                int lastIndex = hotel.getImageFolder().lastIndexOf("/");
-                                double discount = Double.parseDouble(hotel.getImageFolder().substring(lastIndex + 1));
-                                agencyMap.put(uri, discount);
-//								hotel.setImageFolder(hotel.getImageFolder().substring(0,lastIndex));
-                                hotelMap.put(hotel, agencyMap);
-                            }
-                        }
-                    } catch (Exception e12) {
-                        e12.printStackTrace();
-                    }
-                }
-                for (int i = 0; i < hotelMap.size(); i++) {
-                    for (int j = 0; j < hotelMap.size(); j++) {
-                        if (i != j) {
-                            try {
-                                Hotel hotel = (Hotel) hotelMap.keySet().toArray()[i];
-                                Hotel toCompare = (Hotel) hotelMap.keySet().toArray()[j];
-                                HashMap<String, Double> agency1 = hotelMap.get(hotel);
-                                String agencyUrl1 = (String) agency1.keySet().toArray()[0];
-                                double discount1 = agency1.get(agencyUrl1);
-                                if (hotel.getName().equals(toCompare.getName())) {
-                                    HashMap<String, Double> agency2 = hotelMap.get(toCompare);
-                                    String agencyUrl2 = (String) agency2.keySet().toArray()[0];
-                                    double discount2 = agency2.get(agencyUrl2);
-                                    if (discount1 >= discount2) {
-                                        hotelMap.remove(toCompare);
-                                    }
-                                }
-                            } catch (Exception e11) {
-                                continue;
-                            }
-                        }
-                    }
-
-                }
-
-                LocalDate ind = LocalDate.parse(DateIn);
-                LocalDate outd = LocalDate.parse(DateOut);
-                String firstname = reservationFirstName.getText();
-                String name = reservationName.getText();
-
-                int roomNumberChoice = Integer.valueOf(roomNumber.getText());
-                String hotelNameChoice = hotelName.getText();
-
-                Hotel selectedHotel = null;
-                Room selectedRoom = null;
-
-                for (Hotel key : hotelMap.keySet()) {
-                    if (key.getName().equals(hotelNameChoice)) {
-                        selectedHotel = key;
-                        for (Room room : key.getRooms()) {
-                            if (room.getNumber() == roomNumberChoice) {
-                                selectedRoom = room;
-                            }
-                        }
-                    }
-                }
-
-                //int lastIndex = selectedHotel.getImageFolder().lastIndexOf("/");
-                double discount = 0;
-                for (Entry<Hotel, HashMap<String, Double>> map : hotelMap.entrySet()) {
-                    if (map.getKey().equals(selectedHotel)) {
-                        String agencyURI = (String) map.getValue().keySet().toArray()[0];
-                        discount = map.getValue().get(agencyURI);
-                        break;
-                    }
-                }
-
-                int hotelChoiceNumber = hotelChoice.getSelectedIndex();
-
-                Reservation reservation = new Reservation(firstname + " " + name, ind, outd, discount, selectedRoom);
-                selectedRoom.getReservations().add(reservation);
-                String agencyURI = "";
-                for (Entry<Hotel, HashMap<String, Double>> map : hotelMap.entrySet()) {
-                    if (map.getKey().equals(selectedHotel)) {
-                        agencyURI = (String) map.getValue().keySet().toArray()[0];
-                        break;
-                    }
-                }
-                String url = agencyURI + "/resa/" + String.valueOf(selectedHotel.getId());
-//                proxy.put(url, selectedHotel);
-                MainFunctions.getRecipe(selectedHotel, reservation.getClient(), reservation);
-                MainFunctions.makePdf(selectedHotel, reservation.getClient(), reservation);
+                MainFunctions.getRecipe(selectedH, reservation.getClient(), reservation);
+                MainFunctions.makePdf(selectedH, reservation.getClient(), reservation);
 
                 payBtn.setVisible(false);
                 payBtnCover.setVisible(false);
@@ -1082,16 +941,22 @@ public class ClientGUI extends JFrame {
                 quitCover.setVisible(true);
                 exitBtn.setVisible(true);
 
-                JOptionPane.showMessageDialog(null,
-                        "Votre commande est enregistrée",
-                        url, JOptionPane.WARNING_MESSAGE);
+//                JOptionPane.showMessageDialog(null,
+//                        "Votre commande est enregistrée",
+//                        , JOptionPane.WARNING_MESSAGE);
 
-                reservedHotel.setText(hotelNameChoice);
-                reservedRoom.setText(String.valueOf(selectedRoom));
-                clientInfos.setText(firstname + " " + name);
+                reservedHotel.setText("Hotel: " + selectedH.getName());
+                reservedRoom.setText("Room: " + selectedR.getNumber());
+                clientInfos.setText("Mr. " + reservationFirstName.getText() + " " + reservationName.getText());
+                dateInInfo.setText(LocalDate.parse(DateIn).getDayOfMonth() + "-" + LocalDate.parse(DateIn).getMonth() + "-" + LocalDate.parse(DateIn).getYear());
+                dateOutInfo.setText(LocalDate.parse(DateOut).getDayOfMonth() + "-" + LocalDate.parse(DateOut).getMonth() + "-" + LocalDate.parse(DateOut).getYear());
+
+
+                clientInfos.setVisible(true);
                 reservedRoom.setVisible(true);
                 reservedHotel.setVisible(true);
-                clientInfos.setVisible(true);
+                dateInInfo.setVisible(true);
+                dateOutInfo.setVisible(true);
             }
         });
 

@@ -18,9 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ClientService {
-    static public Map<String, Integer> agenciesPorts = new HashMap<>() {{
-        put("Agency A", 7001);
-    }};
+    static public Map<String, Integer> agenciesPorts = new HashMap<>();
     static List<Agency> agencies = new ArrayList<Agency>();
 
     static List<Hotel> searchedHotels = new ArrayList<Hotel>();
@@ -93,7 +91,7 @@ public class ClientService {
     }
 
     static public List<Hotel> searchRooms(String position, Integer rating, LocalDate dateIn, LocalDate dateOut, Integer size, Double price) {
-
+        searchedHotels.clear();
         for (Integer agencyPort : agenciesPorts.values()) {
 
             ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", agencyPort).usePlaintext() // Disable encryption (useful for local testing)
